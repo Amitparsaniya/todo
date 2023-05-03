@@ -8,7 +8,6 @@ const userTodoSchema = new mongoose.Schema({
     },
     task:{
             type:String,
-            required:true
         },
     image: {
         type: String || File || Object,

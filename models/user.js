@@ -54,15 +54,15 @@ userSchema.methods.comparepassword = async function(password){
     return result
 }
 
-userSchema.pre("save",async function(next){
-    const user =this
-    if(user.isModified('token')){
-        if(user.token!==null){
-            user.token =await bcrypt.hash(user.token,10)
-        }
-    }
-    next()
-})
+// userSchema.pre("save",async function(next){
+//     const user =this
+//     if(user.isModified('token')){
+//         if(user.token!==null){
+//             user.token =await bcrypt.hash(user.token,10)
+//         }
+//     }
+//     next()
+// })
 userSchema.methods.comparetoken = async function(token){
    const user =this
        const result =await bcrypt.compare(token,user.token)
@@ -80,9 +80,11 @@ userSchema.pre("save",async function(next){
 })
 
 userSchema.methods.compareotp = async function(otp){
-    const user =this
+    const user = this
+    if(user.otp !==null){
         const result =await bcrypt.compare(otp,user.otp)
         return result
+    }
  }
 
 

@@ -17,8 +17,8 @@ exports.createTodo = async (req, res) => {
     });
     await todo.save();
     sendScuccess(res, messages.CREATE_TASK_USER, statusCode.CREATE);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -29,8 +29,8 @@ exports.getTasks = async (req, res) => {
       .skip((page - 1) * item_per_page)
       .limit(item_per_page);
     sendScuccess(res, user, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
 exports.getTaskById = async (req, res) => {
@@ -38,11 +38,11 @@ exports.getTaskById = async (req, res) => {
     const TaskId = req.params.taskid;
     const task = await UserTodo.findById(TaskId);
     sendScuccess(res, task, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
-exports.serchdata = async (req, res) => {
+exports.serchTaskByDate = async (req, res) => {
   try {
     date = req.params.key;
     const userDate = new Date(date);
@@ -66,8 +66,8 @@ exports.serchdata = async (req, res) => {
       );
     }
     sendScuccess(res, data, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -77,8 +77,8 @@ exports.getlatesttask = async (req, res) => {
       createdAt: -1,
     });
     sendScuccess(res, latestTask, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
 exports.updateTask = async (req, res) => {
@@ -102,8 +102,8 @@ exports.updateTask = async (req, res) => {
     }
     await usertask.save();
     sendScuccess(res, messages.UPDATE_TASK, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };
 
@@ -121,8 +121,9 @@ exports.deleteTask = async (req, res) => {
     if (task.image) {
       deletefile(task?.image);
     }
+    await UserTodo.findByIdAndRemove(TaskId);
     sendScuccess(res, messages.TASK_DELETE_SUCCESSFULLY, statusCode.SUCCESS);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   }
 };

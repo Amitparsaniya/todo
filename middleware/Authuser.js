@@ -47,25 +47,60 @@ exports.isAuth = async (req, res, next) => {
         statusCode.ERRORCODE
       );
     }
-
     const jwttoken = token.split("Bearer ")[1];
+    const user =  jwt.verify(
+      jwttoken,
+      process.env.SECRET_KEY,
+      (error, result) => {
+        if(error){
+          return "token expired"
+        }
+        return result
+      })
+      const founduser = await User.findOne({email:user.email})
+      if(user=="token expired"){
+        return sendError(res,"token expired ok!")
+      }
 
-    const decodetoken = jwt.verify(jwttoken, process.env.SECRET_KEY);
-    const { userId } = decodetoken;
 
-    const user = await User.findById(userId);
+      
+      console.log(/decode/,founduser);
+        req.user = founduser || undefined;
+          // console.log(error,"error");
+          // console.log(result,"result");
+          // return sendError(res, "token was expired!", statusCode.ERRORCODE);
+        
+        // return decode
+        // if (decodetoken =="token expired" ) {
+        //   console.log("decodetoken");
+        //   const { email } = decodetoken;
+        //   const user = User.findOne({ email: email });
+        //   if (!user) {
+        //     console.log("trigger");
+        //     return sendError(
+        //       res,
+        //       errormessages.UNAUTHORIZED_ACCESS,
+        //       statusCode.ERRORCODE
+        //     );
+        //   }
+        // }
+      
+    
+  next()
+    // console.log(user);
 
-    if (!user) {
-      return sendError(
-        res,
-        errormessages.UNAUTHORIZED_ACCESS,
-        statusCode.ERRORCODE
-      );
-    }
-
-    req.user = user;
-    next();
-  } catch (e) {
-    console.log(e);
+    //     const {TokenExpiredError}= jwt
+    // if (TokenExpiredError) {
+    //   // console.log(user);
+    //   // user.otp = null;
+    //   // await user.save();
+    //   return sendError(
+    //     res,
+    //     errormessages.UNAUTHORIZED_ACCESS_TOKEN_EXP,
+    //     statusCode.ERRORCODE
+    //   );
+    // }
+  } catch (error) {
+    console.log(/e/, error);
   }
 };
