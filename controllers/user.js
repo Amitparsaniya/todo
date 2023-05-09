@@ -1,5 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 const jwt = require("jsonwebtoken");
+const moment =require("moment")
 require("dotenv").config();
 const User = require("../models/user");
 const { generateOtp } = require("../utils/generateOtp");
@@ -22,21 +23,16 @@ exports.create = async (req, res) => {
         statusCode.ERRORCODE
       );
     }
-
-    const otp = generateOtp();
-    const jwttoken = await jwt.sign({ email: email }, process.env.SECRET_KEY, {
-      expiresIn: 300,
-    });
+    const otp =generateOtp()
     const user = new User({
       name,
       email,
       password,
       otp: otp,
-      token: jwttoken,
     });
+    
 
     console.log(otp);
-    console.log(jwttoken);
 
     await user.save();
 
@@ -86,20 +82,6 @@ exports.verifyEmail = async (req, res) => {
       );
     }
 
-    // if (!req.user) {
-    //   console.log("eeeee");
-    //   user.otp = null;
-    //   await user.save();
-    // }
-
-    // if (user.otp === null) {
-    //    sendError(
-    //     res,
-    //     errormessages.TOKEN_NOT_FOUND,
-    //     statusCode.ERRORCODE
-    //   );
-    // }
-
     const isMatched = await user.compareotp(otp);
 
     if (!isMatched) {
@@ -111,7 +93,6 @@ exports.verifyEmail = async (req, res) => {
     }
 
     user.isVerified = true;
-    console.log(user.otp);
     user.otp = null;
     await user.save();
 
@@ -150,38 +131,29 @@ exports.resendEmailVerificationToken = async (req, res) => {
         statusCode.ERRORCODE
       );
     }
+       
+    const otpcreatetime =user.optCreationTime
+    console.log(/otptime/,otpcreatetime);
 
-    console.log(user.token);
-    let verifytoken;
-    if (user.token) {
-      verifytoken = jwt.verify(
-        user.token,
-        process.env.SECURITY_EMAIL,
-        (error,result) => {
-          if (error) {
-            return "token expired";
-          }
-          return result
-        }
-      );
-      if (verifytoken == "token expired") {
-        const jwttoken = await jwt.sign(
-          { email: user.email },
-          process.env.SECRET_KEY,
-          {
-            expiresIn: 180,
-          }
-        );
-        console.log(jwttoken);
-        user.token = jwttoken;
-        await user.save();
-      }
-    }
+    const time =moment(Date.now())
+     const timediff =time.diff(otpcreatetime, 'minutes')
+     console.log(timediff);
     
-    if (verifytoken !== "token expired") {
-      if (user.otpCounter >= 3) {
-        user.otpCounter = 0;
+     let otp
+    if(timediff >= 61){
+       otp = generateOtp();
+        user.otp = otp;
+        user.otpCounter = 1;
+        user.optCreationTime =  Date.now();
         await user.save();
+    }
+    else if (timediff <=60 && user.otpCounter <3) {
+        console.log('enter');
+         otp = generateOtp();
+        user.otp = otp;
+        user.otpCounter++;
+        await user.save();
+      }else{
         return sendError(
           res,
           errormessages.LIMIT_REACHED,
@@ -189,24 +161,21 @@ exports.resendEmailVerificationToken = async (req, res) => {
         );
       }
 
-      let otp = generateOtp();
-      if (user.otpCounter == 1 || user.otpCounter == 2) {
-        console.log(otp);
-        user.otp = otp;
-        user.otpCounter++;
-        await user.save();
-      }
-    }
+      // if (user.otpCounter == 1 || user.otpCounter == 2) {
+      //   console.log(otp);
+      //   await user.save();
+      // }
+    
 
-    // var transport = generateMailtranspoter();
-    // transport.sendMail({
-    //   from: process.env.VERIFICATION_EMAIL,
-    //   to: user.email,
-    //   subject: subject.EMAIL_VERIFICATION,
-    //   html: `
-    // <p>Your Verification OTP</p>
-    // <h1>${otp}</h1>`,
-    // });
+    var transport = generateMailtranspoter();
+    transport.sendMail({
+      from: process.env.VERIFICATION_EMAIL,
+      to: user.email,
+      subject: subject.EMAIL_VERIFICATION,
+      html: `
+    <p>Your Verification OTP</p>
+    <h1>${otp}</h1>`,
+    });
     sendScuccess(
       res,
       { message: messages.OTP_SENT_TO_EMAIL },
@@ -332,15 +301,14 @@ exports.signIn = async (req, res) => {
         statusCode.ERRORCODE
       );
     }
-
-    const jwttoken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
+    const jwttoken = jwt.sign({ userId: user._id }, process.env.SECRET_KEY,{expiresIn: 300});
 
     sendScuccess(
       res,
       {
         message: messages.SUCCESSFULLY_LOGIN,
         user: {
-          _id: user._id,
+          _id:user._id,
           name: user.name,
           email: user.email,
           token: jwttoken,

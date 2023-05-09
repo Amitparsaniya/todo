@@ -1,6 +1,7 @@
 const mongoose =require("mongoose")
 const bcrypt = require("bcrypt")
 
+
 const userSchema = new mongoose.Schema({
     name:{
         type:String,
@@ -14,18 +15,14 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    token:{
-        type:String,
-        default:null
-    },
     otp:{
         type:String,
         default:null
         
     },
-    otpexpiretime:{
+    optCreationTime:{
        type:Date,
-       default: new Date(Date.now() +  (60*60*1000) )
+       default: Date.now()
     },
     otpCounter:{
         type:Number,
@@ -63,11 +60,11 @@ userSchema.methods.comparepassword = async function(password){
 //     }
 //     next()
 // })
-userSchema.methods.comparetoken = async function(token){
-   const user =this
-       const result =await bcrypt.compare(token,user.token)
-       return result
-}
+// userSchema.methods.comparetoken = async function(token){
+//    const user =this
+//        const result =await bcrypt.compare(token,user.token)
+//        return result
+// }
 
 userSchema.pre("save",async function(next){
     const user =this

@@ -59,7 +59,7 @@ exports.isAuth = async (req, res, next) => {
       })
       const founduser = await User.findOne({email:user.email})
       if(user=="token expired"){
-        return sendError(res,"token expired ok!")
+        return sendError(res,errormessages.TOKEN_EXPIRED,statusCode.ERRORCODE)
       }
 
 

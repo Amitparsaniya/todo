@@ -16,7 +16,8 @@ const errormessages={
     UNAUTHORIZED_ACCESS_TOKEN_EXP:"Token was expired,verify your email id again!",
     TASKID_NOT_FOUND_ON_SERCH_DATE:"Task not found on serch date!",
     SUPPORTED_ONLY_IMAGE_FILE:'supported only image file!',
-    LIMIT_REACHED:"you reached to maximum limit, try after an one hour!"
+    LIMIT_REACHED:"you reached to maximum limit, try after an one hour!",
+    TOKEN_EXPIRED:"Session expired, please login again!"
 }
 
 const validation={

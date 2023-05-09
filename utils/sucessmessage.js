@@ -1,6 +1,6 @@
 const messages={
     CREATE_TASK_USER :"your task created successfully!",
-    CREATE_NEW_USER:"verification otp sent to your emai address",
+    CREATE_NEW_USER:"user created sucessfuly!",
     USER_EMAIL_VERIFIED:"your Email is verified!",
     OTP_SENT_TO_EMAIL:"verification otp sent to your email address",
     FORGET_PASSWORD_LINK:"Link sent to your register email account!",

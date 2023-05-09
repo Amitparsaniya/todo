@@ -7,7 +7,7 @@ const router =express.Router()
 
 router.post("/create",uservalidator,validte,create)
 router.post("/verify-email",isAuth,emailverification,validte,verifyEmail)
-router.post("/resend-emailverification-token",resendEmailVerificationToken)
+router.post("/resend-emailverification-otp",resendEmailVerificationToken)
 router.post("/forget-password",forgetpassword,validte,forgetPassword)
 router.post("/reset-password",passwordvalidator,validte,isvalipasswordresettoken,resetpassword)
 router.post("/signin",signValidator,validte,signIn)
